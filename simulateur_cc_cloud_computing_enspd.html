@@ -1,0 +1,1962 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Simulateur CC - Cloud Computing (ENSPD)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+    /* Animations douces pour les transitions et alertes */
+    @keyframes pulse-urgent {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.03); }
+    }
+    .timer-urgent {
+      animation: pulse-urgent 1s infinite;
+    }
+    /* Personnalisation fine des barres de défilement */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col selection:bg-blue-600 selection:text-white">
+
+  <!-- ==================== EN-TÊTE FIXE ==================== -->
+  <header class="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-slate-200 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
+      <!-- Logo & Titre -->
+      <div class="flex items-center gap-3 min-w-0">
+        <div class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-extrabold text-lg shrink-0 shadow-sm">
+          CC
+        </div>
+        <div class="truncate">
+          <h1 class="text-sm sm:text-base font-bold text-slate-900 truncate">
+            Cloud Computing — Préparation CC
+          </h1>
+          <p class="text-xs text-slate-500 truncate">
+            ENSPD • Cours du Prof. Théophile Fozin (Chapitres 1 à 8)
+          </p>
+        </div>
+      </div>
+
+      <!-- Chronomètre (Visible pendant l'examen) -->
+      <div id="header-timer-container" class="hidden items-center gap-2 sm:gap-4">
+        <div id="timer-badge" class="flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-xl bg-slate-100 border border-slate-200 font-mono text-base sm:text-lg font-bold text-slate-800 transition-colors">
+          <svg class="w-5 h-5 text-blue-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span id="timer-display">25:00</span>
+        </div>
+
+        <button id="btn-submit-top" onclick="openConfirmModal()" class="px-3 sm:px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white text-xs sm:text-sm font-semibold shadow-sm transition cursor-pointer">
+          Terminer le CC
+        </button>
+      </div>
+
+      <!-- Bouton Retour Accueil (Visible sur résultats) -->
+      <div id="header-home-container" class="hidden">
+        <button onclick="returnToHome()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-900 text-white text-xs sm:text-sm font-semibold transition cursor-pointer">
+          Nouvel Entraînement
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==================== CONTENU PRINCIPAL ==================== -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+
+    <!-- 1. ÉCRAN D'ACCUEIL -->
+    <section id="view-home" class="max-w-4xl mx-auto space-y-6">
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-semibold mb-4">
+          <span>Simulation Officielle Contrôle Continu</span>
+        </div>
+        <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+          Simulateur d'Examen : Fundamentals of Cloud Computing
+        </h2>
+        <p class="mt-3 text-slate-600 text-sm sm:text-base leading-relaxed">
+          Entraînez-vous dans les conditions réelles du Contrôle Continu décrites par l'enseignant :
+          <strong>25 questions aléatoires en 25 minutes</strong>. À la fin du compte à rebours, le questionnaire se verrouille et calcule automatiquement votre note sur 25 et sur 20.
+        </p>
+
+        <!-- Règles en 3 cartes -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6">
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200/80">
+            <div class="text-blue-600 font-bold text-xl">25 QCM</div>
+            <div class="text-xs text-slate-600 mt-1">Tirés aléatoirement parmi une banque de 75 QCM couvrant les 8 chapitres.</div>
+          </div>
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200/80">
+            <div class="text-amber-600 font-bold text-xl">25 Minutes</div>
+            <div class="text-xs text-slate-600 mt-1">Chronomètre strict. Fermeture et soumission automatiques à 00:00.</div>
+          </div>
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200/80">
+            <div class="text-emerald-600 font-bold text-xl">100 % QCM</div>
+            <div class="text-xs text-slate-600 mt-1">Choix unique (radio) ou choix multiples (cases à cocher) avec options mélangées.</div>
+          </div>
+        </div>
+
+        <!-- Sélection du mode / filtre par chapitre -->
+        <div class="mt-8 pt-6 border-t border-slate-100">
+          <label for="chapter-select" class="block text-sm font-bold text-slate-800 mb-2">
+            Choisir le périmètre de la session :
+          </label>
+          <div class="flex flex-col sm:flex-row gap-3">
+            <select id="chapter-select" class="flex-1 rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <option value="ALL">Examen Blanc Complet — Tous les chapitres (1 à 8) [Recommandé]</option>
+              <option value="1">Chapitre 1 : Computing Paradigms (HPC, Cluster, Grid, Quantum, Optical...)</option>
+              <option value="2">Chapitre 2 : Cloud Computing Fundamentals (NIST, 5 caractéristiques, Écosystème)</option>
+              <option value="3">Chapitre 3 : Cloud Architecture & Management (4 couches, Migration, Gestion)</option>
+              <option value="4">Chapitre 4 : Cloud Deployment Models (Private, Public, Community, Hybrid)</option>
+              <option value="5">Chapitre 5 : Cloud Service Models (IaaS, PaaS, SaaS, XaaS)</option>
+              <option value="6">Chapitre 6 : Technological Drivers (SOA, RAID/SAN/NAS, Web 2.0/3.0, MapReduce)</option>
+              <option value="7">Chapitre 7 : Virtualization (Anneaux Ring 0-3, Full/Para/HW, Hyperviseurs Type 1/2)</option>
+              <option value="8">Chapitre 8 : Service Level Agreement (SLA, SLO, SLI, KPI, Uptime & Métriques)</option>
+            </select>
+
+            <button onclick="startExam()" class="px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold text-sm sm:text-base shadow-md shadow-blue-600/20 transition flex items-center justify-center gap-2 cursor-pointer shrink-0">
+              <span>Démarrer le CC (25 min)</span>
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
+            </button>
+          </div>
+          <p class="text-xs text-slate-500 mt-2">
+            Note : Si vous choisissez un chapitre spécifique, le quiz comportera toutes les questions disponibles de ce chapitre (jusqu'à 25) avec le même chronomètre. L'ordre des questions et des réponses est systématiquement mélangé.
+          </p>
+        </div>
+      </div>
+
+      <!-- Plan du cours couvert -->
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+        <h3 class="text-base font-bold text-slate-900 mb-4">Programme révisé dans la banque de questions :</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs sm:text-sm">
+          <div class="p-3 rounded-xl bg-slate-50 border border-slate-100"><span class="font-bold text-blue-700">Ch. 1 :</span> HPC, Parallèle, Distribué, Cluster, Grid, Quantum, Optical, Nano</div>
+          <div class="p-3 rounded-xl bg-slate-50 border border-slate-100"><span class="font-bold text-blue-700">Ch. 2 :</span> Définition NIST, 5 caractéristiques essentielles, Acteurs CSU/CSP/CSN</div>
+          <div class="p-3 rounded-xl bg-slate-50 border border-slate-100"><span class="font-bold text-blue-700">Ch. 3 :</span> Architecture en 4 couches, Connectivité, Provisioning & 5 phases migration</div>
+          <div class="p-3 rounded-xl bg-slate-50 border border-slate-100"><span class="font-bold text-blue-700">Ch. 4 :</span> Déploiement Privé (On-premise/Outsourced), Public, Communautaire, Hybride</div>
+          <div class="p-3 rounded-xl bg-slate-50 border border-slate-100"><span class="font-bold text-blue-700">Ch. 5 :</span> Responsabilités IaaS, PaaS, SaaS, fournisseurs & variantes XaaS</div>
+          <div class="p-3 rounded-xl bg-slate-50 border border-slate-100"><span class="font-bold text-blue-700">Ch. 6 :</span> SOA (WSDL/UDDI/SOAP), SAN/NAS/RAID, Web 3.0, Agile, MapReduce/BSP</div>
+          <div class="p-3 rounded-xl bg-slate-50 border border-slate-100"><span class="font-bold text-blue-700">Ch. 7 :</span> Anneaux Ring 0-3, Full/Paravirtualisation/HW-Assisted, Hyperviseurs Type 1 & 2</div>
+          <div class="p-3 rounded-xl bg-slate-50 border border-slate-100"><span class="font-bold text-blue-700">Ch. 8 :</span> Contrats SLA, SLO, SLI, KPI, WSLA, Auditabilité, Uptime (99.9% à 99.995%)</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. ÉCRAN D'EXAMEN EN COURS -->
+    <section id="view-exam" class="hidden grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      
+      <!-- Zone Principale de la Question (8 colonnes sur desktop) -->
+      <div class="lg:col-span-8 bg-white rounded-2xl border border-slate-200 shadow-sm p-5 sm:p-8">
+        <!-- Méta-données de la question -->
+        <div class="flex flex-wrap items-center justify-between gap-2 pb-4 border-b border-slate-100">
+          <div class="flex items-center gap-2">
+            <span id="q-number-badge" class="px-3 py-1 rounded-lg bg-blue-600 text-white text-xs font-bold">
+              Question 1 / 25
+            </span>
+            <span id="q-type-badge" class="px-2.5 py-1 rounded-lg bg-indigo-50 text-indigo-700 text-xs font-semibold">
+              QCM — Choix unique
+            </span>
+          </div>
+          <span id="q-chapter-badge" class="text-xs font-medium text-slate-500 bg-slate-100 px-2.5 py-1 rounded-lg">
+            Chapitre 1
+          </span>
+        </div>
+
+        <!-- Énoncé de la question -->
+        <div class="mt-5">
+          <h3 id="q-text" class="text-base sm:text-lg font-bold text-slate-900 leading-snug">
+            Chargement de la question...
+          </h3>
+          <p id="q-instruction" class="text-xs text-slate-500 mt-1.5 italic">
+            Sélectionnez une seule réponse.
+          </p>
+        </div>
+
+        <!-- Zone dynamique des réponses selon le type -->
+        <div id="q-options-container" class="mt-6 space-y-3">
+          <!-- Injecté par JavaScript -->
+        </div>
+
+        <!-- Barre d'actions inférieure (Précédent, Marquer à revoir, Suivant) -->
+        <div class="mt-8 pt-5 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3">
+          <button id="btn-prev" onclick="prevQuestion()" class="px-4 py-2.5 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-sm font-semibold transition disabled:opacity-40 cursor-pointer">
+            ← Précédente
+          </button>
+
+          <button id="btn-flag" onclick="toggleFlag()" class="px-4 py-2.5 rounded-xl border border-amber-300 bg-amber-50 hover:bg-amber-100 text-amber-800 text-xs sm:text-sm font-semibold transition flex items-center gap-1.5 cursor-pointer">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9" />
+            </svg>
+            <span id="btn-flag-text">Marquer à revoir</span>
+          </button>
+
+          <button id="btn-next" onclick="nextQuestion()" class="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold transition cursor-pointer">
+            Suivante →
+          </button>
+        </div>
+      </div>
+
+      <!-- Panneau Latéral : Grille de Navigation & Progression (4 colonnes sur desktop) -->
+      <aside class="lg:col-span-4 bg-white rounded-2xl border border-slate-200 shadow-sm p-5 space-y-5">
+        <div>
+          <div class="flex items-center justify-between text-sm font-bold text-slate-800 mb-2">
+            <span>Progression</span>
+            <span id="progress-text" class="text-blue-600">0 / 25 répondues</span>
+          </div>
+          <div class="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden">
+            <div id="progress-bar" class="h-full bg-blue-600 transition-all duration-300" style="width: 0%"></div>
+          </div>
+        </div>
+
+        <!-- Grille des 25 numéros -->
+        <div>
+          <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">
+            Navigation rapide
+          </p>
+          <div id="question-grid" class="grid grid-cols-5 gap-2">
+            <!-- Boutons 1 à 25 injectés par JS -->
+          </div>
+        </div>
+
+        <!-- Légende -->
+        <div class="pt-3 border-t border-slate-100 grid grid-cols-2 gap-2 text-xs text-slate-600">
+          <div class="flex items-center gap-2">
+            <span class="w-3.5 h-3.5 rounded bg-blue-600 inline-block"></span>
+            <span>Actuelle</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="w-3.5 h-3.5 rounded bg-emerald-100 border border-emerald-400 inline-block"></span>
+            <span>Répondue</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="w-3.5 h-3.5 rounded bg-amber-100 border border-amber-400 inline-block"></span>
+            <span>À revoir</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="w-3.5 h-3.5 rounded bg-slate-100 border border-slate-300 inline-block"></span>
+            <span>Non répondue</span>
+          </div>
+        </div>
+
+        <button onclick="openConfirmModal()" class="w-full py-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-sm font-bold transition cursor-pointer">
+          Soumettre ma copie maintenant
+        </button>
+      </aside>
+    </section>
+
+    <!-- 3. ÉCRAN DES RÉSULTATS ET CORRECTION DÉTAILLÉE -->
+    <section id="view-results" class="hidden max-w-5xl mx-auto space-y-6">
+      
+      <!-- Bandeau de synthèse du score -->
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8">
+        <div id="timeout-banner" class="hidden mb-5 p-4 rounded-xl bg-amber-50 border border-amber-300 text-amber-900 text-sm font-semibold flex items-center gap-3">
+          <svg class="w-6 h-6 text-amber-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span>Temps écoulé (25:00) ! Votre questionnaire a été automatiquement verrouillé et corrigé.</span>
+        </div>
+
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div>
+            <span class="text-xs font-bold uppercase tracking-wider text-blue-600">Bilan du Contrôle Continu</span>
+            <h2 id="result-title" class="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1">
+              Résultat de votre simulation
+            </h2>
+            <p id="result-feedback" class="text-sm text-slate-600 mt-2">
+              Voici le détail de votre performance par chapitre et la correction commentée selon le cours.
+            </p>
+          </div>
+
+          <!-- Cartes de notes -->
+          <div class="flex flex-wrap sm:flex-nowrap gap-3 shrink-0">
+            <div class="px-5 py-4 rounded-2xl bg-blue-50 border border-blue-200 text-center min-w-[120px]">
+              <div class="text-xs font-semibold text-blue-700 uppercase">Score Brut</div>
+              <div id="score-raw" class="text-2xl sm:text-3xl font-extrabold text-blue-900 mt-1">0 / 25</div>
+            </div>
+            <div class="px-5 py-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-center min-w-[120px]">
+              <div class="text-xs font-semibold text-emerald-700 uppercase">Note / 20</div>
+              <div id="score-20" class="text-2xl sm:text-3xl font-extrabold text-emerald-900 mt-1">0.00 / 20</div>
+            </div>
+            <div class="px-5 py-4 rounded-2xl bg-slate-100 border border-slate-200 text-center min-w-[120px]">
+              <div class="text-xs font-semibold text-slate-600 uppercase">Temps utilisé</div>
+              <div id="time-used" class="text-xl sm:text-2xl font-extrabold text-slate-800 mt-1.5">00:00</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Performance par chapitre -->
+        <div class="mt-8 pt-6 border-t border-slate-100">
+          <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wider mb-3">
+            Analyse par chapitre du cours
+          </h3>
+          <div id="chapter-breakdown" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            <!-- Injecté par JS -->
+          </div>
+        </div>
+
+        <!-- Boutons d'action -->
+        <div class="mt-6 pt-5 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3">
+          <div class="flex flex-wrap gap-2">
+            <button onclick="filterReview('ALL')" id="filter-all" class="px-3.5 py-2 rounded-xl bg-slate-900 text-white text-xs font-semibold cursor-pointer">
+              Toutes les questions
+            </button>
+            <button onclick="filterReview('WRONG')" id="filter-wrong" class="px-3.5 py-2 rounded-xl bg-rose-50 text-rose-700 border border-rose-200 text-xs font-semibold cursor-pointer">
+              Uniquement mes erreurs
+            </button>
+          </div>
+
+          <button onclick="restartSameSettings()" class="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold shadow-sm transition cursor-pointer">
+            ↻ Recommencer un nouveau tirage
+          </button>
+        </div>
+      </div>
+
+      <!-- Liste détaillée des corrections -->
+      <div id="review-list" class="space-y-4">
+        <!-- Injecté par JS -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ==================== MODALE DE CONFIRMATION ==================== -->
+  <div id="confirm-modal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-200">
+      <h3 class="text-lg font-bold text-slate-900">Terminer et soumettre le CC ?</h3>
+      <p id="modal-unanswered-warning" class="text-sm text-slate-600 mt-2">
+        Êtes-vous sûr de vouloir clôturer votre session et afficher votre score ?
+      </p>
+      <div class="mt-6 flex justify-end gap-3">
+        <button onclick="closeConfirmModal()" class="px-4 py-2 rounded-xl border border-slate-300 text-slate-700 text-sm font-semibold hover:bg-slate-50 cursor-pointer">
+          Continuer l'examen
+        </button>
+        <button onclick="finishExam(false)" class="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold cursor-pointer">
+          Oui, voir mon score
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== LOGIQUE JAVASCRIPT & BANQUE DE QUESTIONS ==================== -->
+  <script>
+    /**
+     * BANQUE DE 75 QCM STRICTEMENT BASÉE SUR LES 8 CHAPITRES DU COURS DU PROF. FOZIN THÉOPHILE
+     * Types conservés uniquement :
+     * - 'single'   : QCM à choix unique (boutons radio / lettres A, B, C, D)
+     * - 'multiple' : QCM à choix multiples (cases à cocher / lettres A, B, C, D)
+     */
+    const CHAPTER_NAMES = {
+      1: "Ch. 1 : Computing Paradigms",
+      2: "Ch. 2 : Cloud Fundamentals",
+      3: "Ch. 3 : Cloud Architecture & Mgmt",
+      4: "Ch. 4 : Deployment Models",
+      5: "Ch. 5 : Service Models (XaaS)",
+      6: "Ch. 6 : Technological Drivers",
+      7: "Ch. 7 : Virtualization",
+      8: "Ch. 8 : Service Level Agreement"
+    };
+
+    const QUESTION_BANK = [
+      // ================= CHAPITRE 1 : COMPUTING PARADIGMS (10 QCM) =================
+      {
+        id: "c1_1", chapter: 1, type: "single",
+        question: "Dans une architecture de calcul haute performance (HPC), quel composant est chargé d'ordonnancer et de distribuer les tâches aux nœuds de calcul ?",
+        options: [
+          "Le Head node (intégrant le Scheduler)",
+          "Le bus de mémoire partagée (Crossbar)",
+          "L'annuaire UDDI",
+          "L'hyperviseur hébergé de type 2"
+        ],
+        answer: 0,
+        explanation: "Dans l'architecture HPC du Chapitre 1, le Head node intègre le Scheduler qui distribue le travail vers les différents Computing nodes."
+      },
+      {
+        id: "c1_2", chapter: 1, type: "multiple",
+        question: "Quelles sont les quatre caractéristiques fondamentales d'un système distribué (Distributed Computing) selon le cours ?",
+        options: [
+          "Scalability (Extensibilité)",
+          "Openness (Ouverture)",
+          "Transparency (Transparence)",
+          "Redundancy / Replication (Redondance)",
+          "Homogénéité matérielle obligatoire"
+        ],
+        answer: [0, 1, 2, 3],
+        explanation: "Un système distribué possède 4 caractéristiques clés : Scalability, Openness, Transparency et Redundancy/Replication. Il peut relier des machines homogènes ou hétérogènes."
+      },
+      {
+        id: "c1_3", chapter: 1, type: "single",
+        question: "Quelle proposition caractérise exactement le calcul parallèle (Parallel Computing) par rapport au calcul distribué ?",
+        options: [
+          "Il utilise généralement des processeurs homogènes partageant une mémoire commune via un bus ou un crossbar",
+          "Il relie uniquement des machines géographiquement éloignées sur Internet (WAN)",
+          "Il exclut toute décomposition d'un problème en sous-tâches simultanées",
+          "Il s'appuie exclusivement sur des molécules d'ADN"
+        ],
+        answer: 0,
+        explanation: "Le calcul parallèle (HPC) utilise un ensemble de processeurs homogènes partageant une mémoire commune (via bus ou crossbar) pour exécuter simultanément des tâches découpées."
+      },
+      {
+        id: "c1_4", chapter: 1, type: "single",
+        question: "Quel protocole de communication standard est utilisé dans un Cluster Computing pour permettre aux nœuds de s'échanger des messages ?",
+        options: [
+          "MPI (Message Passing Interface)",
+          "WSDL (Web Services Description Language)",
+          "UDDI (Universal Description, Discovery and Integration)",
+          "FCoE (Fibre Channel over Ethernet)"
+        ],
+        answer: 0,
+        explanation: "Le Cluster Computing s'appuie sur un réseau local dédié haute vitesse et un environnement logiciel commun utilisant MPI (Message Passing Interface) et un répertoire partagé."
+      },
+      {
+        id: "c1_5", chapter: 1, type: "single",
+        question: "Quelle est la principale motivation économique d'une organisation pour adopter le Grid Computing ?",
+        options: [
+          "Maximiser le retour sur investissement (ROI) en exploitant les ressources informatiques sous-utilisées",
+          "Remplacer les processeurs en silicium par des photons",
+          "Éliminer tout besoin de middleware entre les serveurs",
+          "Garantir un accès exclusif à un seul fournisseur Cloud public"
+        ],
+        answer: 0,
+        explanation: "Le Grid Computing vise à fédérer les ressources sous-utilisées à travers différentes organisations via un middleware afin d'augmenter le ROI."
+      },
+      {
+        id: "c1_6", chapter: 1, type: "single",
+        question: "Quel paradigme de calcul utilise des photons se déplaçant à environ 10 % de la vitesse de la lumière au lieu du courant électrique ?",
+        options: [
+          "Optical Computing",
+          "Quantum Computing",
+          "Biocomputing",
+          "Nanocomputing"
+        ],
+        answer: 0,
+        explanation: "L'Optical Computing remplace les électrons par des photons (lumière) pour contourner les limitations physiques des puces électroniques classiques."
+      },
+      {
+        id: "c1_7", chapter: 1, type: "single",
+        question: "Quel paradigme de calcul émergent vise à contourner la limite de la loi de Moore (doublement tous les 18 mois) grâce à la superposition quantique ?",
+        options: [
+          "Quantum Computing",
+          "Mobile Computing",
+          "Network Computing",
+          "Cluster Computing"
+        ],
+        answer: 0,
+        explanation: "Le Quantum Computing exploite les propriétés de la physique quantique (qubits) pour dépasser les limites physiques de miniaturisation du silicium liées à la loi de Moore."
+      },
+      {
+        id: "c1_8", chapter: 1, type: "single",
+        question: "Quelle affirmation distingue correctement le Grid Computing du Cloud Computing ?",
+        options: [
+          "La Grille agrège plusieurs ordinateurs pour résoudre un problème parallèle spécifique, tandis que le Cloud fournit une infrastructure unifiée et des ressources à la demande",
+          "Le Cloud Computing n'utilise jamais de virtualisation contrairement à la Grille",
+          "La Grille est exclusivement commerciale alors que le Cloud est uniquement académique",
+          "Le Cloud Computing fonctionne sans connexion réseau"
+        ],
+        answer: 0,
+        explanation: "Le Grid Computing vise l'exécution d'un calcul parallèle massif sur des machines distribuées, alors que le Cloud expose un pool unifié de ressources et services à la demande."
+      },
+      {
+        id: "c1_9", chapter: 1, type: "single",
+        question: "Quel paradigme repose sur l'architecture traditionnelle Client/Serveur où le serveur traite les données et le client affiche les résultats ?",
+        options: [
+          "Network Computing",
+          "Biocomputing",
+          "Nanocomputing",
+          "Optical Computing"
+        ],
+        answer: 0,
+        explanation: "Le Network Computing (calcul en réseau) désigne le modèle client/serveur classique dans lequel le serveur exécute les traitements et le client reçoit les résultats."
+      },
+      {
+        id: "c1_10", chapter: 1, type: "multiple",
+        question: "Parmi les paradigmes suivants cités au Chapitre 1, lesquels reposent sur des supports non-silicium ou à l'échelle moléculaire/atomique ?",
+        options: [
+          "Biocomputing (systèmes de molécules biologiques comme l'ADN)",
+          "Nanocomputing (nanotubes de carbone à l'échelle nanométrique)",
+          "Optical Computing (photons)",
+          "Cluster Computing (serveurs x86 reliés en Ethernet)"
+        ],
+        answer: [0, 1, 2],
+        explanation: "Biocomputing, Nanocomputing et Optical Computing sont les paradigmes alternatifs au silicium classique présentés dans le cours."
+      },
+
+      // ================= CHAPITRE 2 : CLOUD FUNDAMENTALS (8 QCM) =================
+      {
+        id: "c2_1", chapter: 2, type: "multiple",
+        question: "Selon la définition officielle du NIST, quelles sont les 5 caractéristiques essentielles du Cloud Computing ?",
+        options: [
+          "On-demand self-service",
+          "Broad network access",
+          "Resource pooling",
+          "Rapid elasticity",
+          "Measured service",
+          "Zero-latency guarantee"
+        ],
+        answer: [0, 1, 2, 3, 4],
+        explanation: "Le NIST définit exactement 5 caractéristiques essentielles : On-demand self-service, Broad network access, Resource pooling, Rapid elasticity et Measured service."
+      },
+      {
+        id: "c2_2", chapter: 2, type: "single",
+        question: "Quelle caractéristique du NIST décrit la mutualisation des ressources physiques et virtuelles pour servir plusieurs consommateurs selon un modèle multi-locataire (multitenant) ?",
+        options: [
+          "Resource pooling",
+          "Measured service",
+          "Broad network access",
+          "On-demand self-service"
+        ],
+        answer: 0,
+        explanation: "Le 'Resource pooling' permet au fournisseur de regrouper ses ressources (stockage, traitement, mémoire, bande passante) et de les assigner dynamiquement à plusieurs locataires."
+      },
+      {
+        id: "c2_3", chapter: 2, type: "single",
+        question: "Quelle caractéristique du NIST stipule que les capacités disponibles paraissent souvent illimitées à l'utilisateur et peuvent être ajustées rapidement (scale out / scale in) ?",
+        options: [
+          "Rapid elasticity",
+          "Measured service",
+          "Broad network access",
+          "On-demand self-service"
+        ],
+        answer: 0,
+        explanation: "La 'Rapid elasticity' permet d'augmenter ou de réduire rapidement et automatiquement les ressources en fonction des variations de la demande."
+      },
+      {
+        id: "c2_4", chapter: 2, type: "single",
+        question: "Dans l'écosystème Cloud présenté au Chapitre 2, que désigne le sigle CSN ?",
+        options: [
+          "Cloud Service Partner (Partenaire / Intégrateur de services Cloud)",
+          "Cloud Storage Node (Nœud de stockage physique)",
+          "Central Security Network (Réseau central de sécurité)",
+          "Cloud System Navigator (Navigateur client léger)"
+        ],
+        answer: 0,
+        explanation: "L'écosystème Cloud s'articule autour de trois acteurs : CSU (Cloud Service User), CSP (Cloud Service Provider) et CSN (Cloud Service Partner)."
+      },
+      {
+        id: "c2_5", chapter: 2, type: "single",
+        question: "Comment la caractéristique 'Measured service' se traduit-elle concrètement pour le client Cloud ?",
+        options: [
+          "Les systèmes Cloud contrôlent et optimisent automatiquement l'usage des ressources via une métrologie (facturation à l'usage / pay-as-you-go)",
+          "Le client doit acheter ses propres serveurs physiques avant de mesurer sa consommation",
+          "La bande passante est plafonnée à un nombre fixe d'utilisateurs par jour",
+          "L'accès est restreint uniquement aux postes de travail lourds (thick clients)"
+        ],
+        answer: 0,
+        explanation: "Le 'Measured service' assure le suivi, le contrôle et le reporting transparent de la consommation (stockage, bande passante, comptes actifs)."
+      },
+      {
+        id: "c2_6", chapter: 2, type: "single",
+        question: "Quelle caractéristique du NIST garantit que les services sont accessibles via le réseau par des mécanismes standards sur des plateformes hétérogènes (mobiles, tablettes, laptops, stations de travail) ?",
+        options: [
+          "Broad network access",
+          "Resource pooling",
+          "Rapid elasticity",
+          "On-demand self-service"
+        ],
+        answer: 0,
+        explanation: "Le 'Broad network access' assure l'accessibilité universelle des services via des protocoles standards depuis tout type de terminal client léger ou lourd."
+      },
+      {
+        id: "c2_7", chapter: 2, type: "single",
+        question: "Quel organisme américain de standardisation a établi la définition de référence du Cloud Computing (5 caractéristiques, 3 modèles de service, 4 modèles de déploiement) ?",
+        options: [
+          "NIST (National Institute of Standards and Technology)",
+          "IEEE (Institute of Electrical and Electronics Engineers)",
+          "ISO (International Organization for Standardization)",
+          "W3C (World Wide Web Consortium)"
+        ],
+        answer: 0,
+        explanation: "C'est le NIST (National Institute of Standards and Technology) qui a formalisé la définition de référence du Cloud Computing."
+      },
+      {
+        id: "c2_8", chapter: 2, type: "multiple",
+        question: "Parmi les exigences fondamentales du Cloud Computing (Chapitre 2) pour satisfaire les entreprises, lesquelles sont citées dans le cours ?",
+        options: [
+          "Sécurité, confidentialité et confiance (Security, Privacy & Trust)",
+          "Haute disponibilité et tolérance aux pannes (High Availability & Fault Tolerance)",
+          "Interopérabilité et portabilité entre fournisseurs",
+          "Impossibilité totale d'accéder aux données à distance"
+        ],
+        answer: [0, 1, 2],
+        explanation: "Le Chapitre 2 souligne les exigences clés : sécurité/confidentialité, haute disponibilité/tolérance aux pannes, performance et interopérabilité/portabilité."
+      },
+
+      // ================= CHAPITRE 3 : CLOUD ARCHITECTURE & MANAGEMENT (9 QCM) =================
+      {
+        id: "c3_1", chapter: 3, type: "single",
+        question: "Quelle couche de l'architecture Cloud (Layer 3) est responsable de l'ordonnancement, du provisionnement, de la sécurité et du respect des SLA ?",
+        options: [
+          "Cloud Management Layer",
+          "User / Client Layer",
+          "Network Layer",
+          "Hardware Resource Layer"
+        ],
+        answer: 0,
+        explanation: "La couche 3 (Cloud Management Layer) contient les logiciels de gestion qui pilotent les ressources matérielles, le provisioning, le scheduling et les SLA."
+      },
+      {
+        id: "c3_2", chapter: 3, type: "single",
+        question: "Dans quel ordre chronologique se déroulent les 5 phases de migration d'une application vers le Cloud ?",
+        options: [
+          "Evaluation → Migration strategy → Prototyping → Provisioning → Testing",
+          "Prototyping → Evaluation → Provisioning → Migration strategy → Testing",
+          "Provisioning → Testing → Evaluation → Prototyping → Migration strategy",
+          "Evaluation → Provisioning → Prototyping → Testing → Migration strategy"
+        ],
+        answer: 0,
+        explanation: "Les 5 phases de migration sont : 1. Evaluation, 2. Migration strategy, 3. Prototyping, 4. Provisioning, 5. Testing."
+      },
+      {
+        id: "c3_3", chapter: 3, type: "single",
+        question: "Dans la couche utilisateur (Layer 1), quelle est la principale caractéristique d'un client léger (Thin client) ?",
+        options: [
+          "Il possède une puissance de calcul locale minimale et dépend fortement du serveur Cloud pour le traitement applicatif",
+          "Il exécute l'intégralité de la base de données et des traitements lourds en local sans réseau",
+          "Il désigne exclusivement les serveurs physiques du datacenter",
+          "Il ne peut jamais exécuter un navigateur web"
+        ],
+        answer: 0,
+        explanation: "Les clients légers (navigateurs web, terminaux mobiles) exécutent l'interface minimale et délèguent le calcul et le stockage au Cloud."
+      },
+      {
+        id: "c3_4", chapter: 3, type: "multiple",
+        question: "Quelles tâches relèvent directement de la gestion d'infrastructure dans la couche 'Cloud Management Layer' (Layer 3) ?",
+        options: [
+          "Scheduling (Ordonnancement des ressources)",
+          "Provisioning (Allocation dynamique)",
+          "Load balancing (Équilibrage de charge)",
+          "Server consolidation (Consolidation des serveurs)",
+          "Fabrication physique des câbles fibre optique"
+        ],
+        answer: [0, 1, 2, 3],
+        explanation: "La couche de gestion (Cloud Management Layer) pilote le scheduling, le provisioning, le load balancing et la consolidation des serveurs."
+      },
+      {
+        id: "c3_5", chapter: 3, type: "single",
+        question: "Quelle connectivité réseau est utilisée pour relier les ressources internes à l'intérieur d'un même centre de données Cloud (communication inter-serveurs et stockage) ?",
+        options: [
+          "Intracloud networking",
+          "Public Internet access",
+          "Client-to-browser HTTP tunnel",
+          "Dial-up VPN"
+        ],
+        answer: 0,
+        explanation: "Le cours distingue trois types de connectivité : Public Cloud networking (Internet), Private Cloud networking (VPN/LAN sécurisé) et Intracloud networking (interconnexion interne haute vitesse du datacenter)."
+      },
+      {
+        id: "c3_6", chapter: 3, type: "single",
+        question: "Lors de la migration vers le Cloud, à quelle phase valide-t-on l'architecture choisie sur un échantillon réduit avant le déploiement complet ?",
+        options: [
+          "Prototyping (Phase 3)",
+          "Evaluation (Phase 1)",
+          "Provisioning (Phase 4)",
+          "Testing (Phase 5)"
+        ],
+        answer: 0,
+        explanation: "La phase 3 (Prototyping) consiste à valider le concept et les performances sur un prototype avant le provisionnement global (Phase 4)."
+      },
+      {
+        id: "c3_7", chapter: 3, type: "single",
+        question: "Quelle couche de l'architecture Cloud (Layer 4) regroupe les Data Centers, les serveurs physiques, les baies de stockage et les commutateurs matériels ?",
+        options: [
+          "Hardware Resource Layer",
+          "Cloud Management Layer",
+          "Network Layer",
+          "User / Client Layer"
+        ],
+        answer: 0,
+        explanation: "La couche 4 (Hardware Resource Layer) constitue la base physique de l'architecture Cloud."
+      },
+      {
+        id: "c3_8", chapter: 3, type: "multiple",
+        question: "Parmi les 5 fonctionnalités d'une application Cloud présentées au Chapitre 3 (Anatomie du Cloud), lesquelles figurent dans le cours ?",
+        options: [
+          "Multi-tenancy (Mutualisation multi-locataires)",
+          "Elasticity & Scalability (Élasticité et extensibilité)",
+          "Metering & Billing (Mesure et facturation)",
+          "Self-service provisioning (Auto-provisionnement)",
+          "Exécution mono-utilisateur sans réseau"
+        ],
+        answer: [0, 1, 2, 3],
+        explanation: "Les fonctionnalités clés d'une application/plateforme Cloud incluent le multi-tenancy, l'élasticité, le metering/billing et le self-service."
+      },
+      {
+        id: "c3_9", chapter: 3, type: "single",
+        question: "Quel est l'objectif de la consolidation des serveurs (Server Consolidation) dans la gestion d'un Cloud ?",
+        options: [
+          "Regrouper plusieurs charges de travail sur un nombre réduit de serveurs physiques afin de maximiser leur taux d'utilisation et réduire la consommation électrique",
+          "Acheter un serveur physique dédié différent pour chaque petit service web",
+          "Désactiver la virtualisation dans le datacenter",
+          "Augmenter volontairement le nombre de machines inactives"
+        ],
+        answer: 0,
+        explanation: "La consolidation des serveurs permet d'éviter la sous-utilisation des machines physiques (souvent < 15 %) en hébergeant plusieurs VMs sur un même hôte."
+      },
+
+      // ================= CHAPITRE 4 : CLOUD DEPLOYMENT MODELS (8 QCM) =================
+      {
+        id: "c4_1", chapter: 4, type: "single",
+        question: "Quelle est la différence entre un Cloud Privé 'On-premise' et un Cloud Privé 'Outsourced' ?",
+        options: [
+          "On-premise est hébergé et géré dans les locaux de l'entreprise, tandis qu'Outsourced est hébergé hors site par un prestataire tiers tout en restant dédié à l'entreprise",
+          "On-premise est accessible au grand public, tandis qu'Outsourced est réservé aux universités",
+          "Outsourced ne nécessite aucune connexion réseau",
+          "Il n'y a aucune différence, les deux termes sont synonymes"
+        ],
+        answer: 0,
+        explanation: "Le Cloud Privé peut être déployé sur site (On-premise) ou externalisé chez un hébergeur (Outsourced), tout en restant exclusif à une seule organisation."
+      },
+      {
+        id: "c4_2", chapter: 4, type: "single",
+        question: "Quelle solution logicielle open-source est citée dans le Chapitre 4 comme exemple permettant de construire un Cloud Privé / Hybride compatible avec les APIs d'Amazon AWS ?",
+        options: [
+          "Eucalyptus",
+          "Oracle VirtualBox",
+          "WSDL",
+          "NetSuite"
+        ],
+        answer: 0,
+        explanation: "Eucalyptus est explicitement cité dans le cours comme plateforme permettant le déploiement de clouds privés et hybrides compatibles AWS."
+      },
+      {
+        id: "c4_3", chapter: 4, type: "single",
+        question: "Selon la définition du NIST (Chapitre 4), comment se caractérise un Cloud Hybride (Hybrid Cloud) ?",
+        options: [
+          "Une composition de deux ou plusieurs clouds distincts (privé, communautaire ou public) qui restent des entités uniques mais sont liés par une technologie assurant la portabilité des données et applications",
+          "Un cloud public où tous les serveurs utilisent uniquement Linux",
+          "Un serveur physique unique non connecté à Internet",
+          "Une fusion définitive où le cloud privé devient accessible gratuitement au grand public"
+        ],
+        answer: 0,
+        explanation: "Dans un Cloud Hybride, les clouds composants conservent leur identité propre mais sont interconnectés pour permettre la portabilité des données et des charges de travail."
+      },
+      {
+        id: "c4_4", chapter: 4, type: "single",
+        question: "Plusieurs banques d'une même région décident de mutualiser une infrastructure Cloud répondant aux mêmes exigences strictes de conformité réglementaire et de sécurité financière. De quel modèle s'agit-il ?",
+        options: [
+          "Community Cloud (Cloud Communautaire)",
+          "Public Cloud (Cloud Public)",
+          "Personal Cloud",
+          "On-premise Single-Tenant Cloud"
+        ],
+        answer: 0,
+        explanation: "Le Community Cloud est partagé par plusieurs organisations formant une communauté ayant des préoccupations communes (mission, sécurité, conformité)."
+      },
+      {
+        id: "c4_5", chapter: 4, type: "multiple",
+        question: "Quels sont les principaux avantages d'un Cloud Privé 'On-premise' pour une organisation ?",
+        options: [
+          "Contrôle maximal sur la sécurité et la confidentialité des données",
+          "Faible latence réseau sur le réseau local (LAN)",
+          "Conformité facilitée avec les régulations strictes de souveraineté",
+          "Absence totale d'investissement matériel initial (CAPEX nul)"
+        ],
+        answer: [0, 1, 2],
+        explanation: "Le Cloud Privé On-premise offre un contrôle total, une sécurité maximale et une faible latence, mais exige un investissement matériel initial (CAPEX) élevé."
+      },
+      {
+        id: "c4_6", chapter: 4, type: "single",
+        question: "Quel scénario justifie le recours au 'Cloud Bursting' (débordement vers le Cloud) typique d'un Cloud Hybride ?",
+        options: [
+          "Une entreprise utilise son Cloud privé au quotidien et bascule temporairement vers un Cloud public lors d'un pic soudain de trafic",
+          "Une entreprise supprime définitivement tous ses serveurs locaux pour passer au SaaS",
+          "Un fournisseur coupe l'accès Internet de ses datacenters",
+          "Deux utilisateurs partagent un même ordinateur portable"
+        ],
+        answer: 0,
+        explanation: "Le Cloud Hybride permet de maintenir les données critiques en interne (Cloud privé) tout en absorbant les pics de charge ponctuels via le Cloud public."
+      },
+      {
+        id: "c4_7", chapter: 4, type: "single",
+        question: "Quel est l'inconvénient majeur du Cloud Public (Public Cloud) pour des données hautement sensibles ?",
+        options: [
+          "La perte de contrôle physique sur la localisation des données et les préoccupations liées à la confidentialité/sécurité en environnement mutualisé",
+          "Un investissement matériel initial (CAPEX) prohibitif pour le client",
+          "Une scalabilité très limitée",
+          "L'obligation d'embaucher une équipe de maintenance matérielle pour le datacenter"
+        ],
+        answer: 0,
+        explanation: "Le Cloud Public offre un coût d'entrée très faible et une grande élasticité, mais implique une perte de contrôle direct sur l'infrastructure physique."
+      },
+      {
+        id: "c4_8", chapter: 4, type: "multiple",
+        question: "Quels facteurs orientent le choix d'une organisation entre Cloud Privé, Public, Communautaire ou Hybride ?",
+        options: [
+          "Le niveau de sensibilité et de confidentialité des données",
+          "Les contraintes budgétaires (arbitrage CAPEX vs OPEX)",
+          "Les exigences légales et réglementaires (conformité, souveraineté)",
+          "Les variations de charge et besoins d'élasticité",
+          "La couleur des serveurs dans la salle informatique"
+        ],
+        answer: [0, 1, 2, 3],
+        explanation: "Le choix d'un modèle de déploiement dépend de la sécurité des données, du budget (CAPEX/OPEX), de la conformité réglementaire et de l'élasticité requise."
+      },
+
+      // ================= CHAPITRE 5 : CLOUD SERVICE MODELS (10 QCM) =================
+      {
+        id: "c5_1", chapter: 5, type: "single",
+        question: "Quel est le public cible principal du modèle PaaS (Platform as a Service) selon le Chapitre 5 ?",
+        options: [
+          "Les développeurs d'applications",
+          "Les utilisateurs finaux (End users) de logiciels bureautiques",
+          "Les techniciens chargés du câblage électrique du datacenter",
+          "Uniquement les administrateurs réseau gérant les routeurs physiques"
+        ],
+        answer: 0,
+        explanation: "IaaS cible les architectes/administrateurs IT, PaaS cible les développeurs d'applications, et SaaS cible les utilisateurs finaux."
+      },
+      {
+        id: "c5_2", chapter: 5, type: "single",
+        question: "Dans le modèle PaaS (Platform as a Service), quelles couches restent sous la responsabilité directe du client (utilisateur) ?",
+        options: [
+          "Uniquement les Applications et les Données",
+          "Le Système d'exploitation (OS), le Middleware et les Applications",
+          "Les Serveurs physiques, la Virtualisation et le Stockage",
+          "Aucune couche, tout est géré par le fournisseur"
+        ],
+        answer: 0,
+        explanation: "En PaaS, le fournisseur gère jusqu'au Runtime et Middleware ; le client ne gère que ses Applications et ses Données."
+      },
+      {
+        id: "c5_3", chapter: 5, type: "single",
+        question: "Dans le modèle IaaS (Infrastructure as a Service), quelles couches sont gérées par le fournisseur Cloud (CSP) ?",
+        options: [
+          "La virtualisation, les serveurs physiques, le stockage et le réseau physique",
+          "Les applications métiers, les données et le système d'exploitation invité",
+          "Uniquement l'interface graphique de l'application web",
+          "Le code source des applications développées par le client"
+        ],
+        answer: 0,
+        explanation: "En IaaS, le fournisseur gère l'infrastructure matérielle et la couche de virtualisation, tandis que le client gère l'OS invité, le middleware, les runtimes, les données et les applications."
+      },
+      {
+        id: "c5_4", chapter: 5, type: "single",
+        question: "Quel est l'un des inconvénients majeurs du modèle PaaS souligné dans le Chapitre 5 ?",
+        options: [
+          "Le risque de verrouillage fournisseur (Vendor lock-in) lié aux APIs et outils propriétaires de la plateforme",
+          "L'obligation pour le développeur de remplacer les disques durs défectueux dans le datacenter",
+          "L'impossibilité de déployer des applications web",
+          "L'absence de bases de données"
+        ],
+        answer: 0,
+        explanation: "Le 'Vendor lock-in' (dépendance envers un fournisseur) est un inconvénient majeur du PaaS car l'application dépend fortement des runtimes/services spécifiques de la plateforme."
+      },
+      {
+        id: "c5_5", chapter: 5, type: "multiple",
+        question: "Parmi les plateformes suivantes, lesquelles sont des exemples d'infrastructures ou logiciels IaaS cités dans le cours ?",
+        options: [
+          "OpenStack",
+          "OpenNebula",
+          "CloudStack",
+          "Google Compute Engine (GCE)",
+          "Salesforce CRM"
+        ],
+        answer: [0, 1, 2, 3],
+        explanation: "OpenStack, OpenNebula, CloudStack et Google Compute Engine (GCE) sont des solutions IaaS. Salesforce CRM est un exemple emblématique de SaaS."
+      },
+      {
+        id: "c5_6", chapter: 5, type: "single",
+        question: "Dans la famille des modèles XaaS (Everything as a Service), que signifie l'acronyme DRaaS ?",
+        options: [
+          "Disaster Recovery as a Service (Plan de reprise d'activité après sinistre)",
+          "Data Routing as a Service",
+          "Desktop Rendering as a Service",
+          "Dynamic RAM as a Service"
+        ],
+        answer: 0,
+        explanation: "DRaaS désigne 'Disaster Recovery as a Service', permettant la réplication et le basculement de l'infrastructure en cas de sinistre."
+      },
+      {
+        id: "c5_7", chapter: 5, type: "single",
+        question: "Quel hyperviseur sous-jacent est historiquement associé à Google Compute Engine (GCE) dans le tableau comparatif IaaS du Chapitre 5 ?",
+        options: [
+          "KVM",
+          "Hyper-V",
+          "VirtualBox",
+          "Bochs"
+        ],
+        answer: 0,
+        explanation: "Selon le cours (Chapitre 5), AWS utilise Xen (puis Nitro), Azure utilise Hyper-V et Google Compute Engine (GCE) utilise KVM."
+      },
+      {
+        id: "c5_8", chapter: 5, type: "multiple",
+        question: "Lesquels de ces services appartiennent à la catégorie PaaS (Platform as a Service) ?",
+        options: [
+          "Google App Engine (GAE)",
+          "Heroku",
+          "Cloud Foundry",
+          "Microsoft Office 365"
+        ],
+        answer: [0, 1, 2],
+        explanation: "Google App Engine (GAE), Heroku et Cloud Foundry sont des plateformes PaaS. Microsoft Office 365 est un service SaaS."
+      },
+      {
+        id: "c5_9", chapter: 5, type: "single",
+        question: "Dans le modèle SaaS (Software as a Service), qui assure la maintenance, les mises à jour logicielles et la sécurité de l'application ?",
+        options: [
+          "Le fournisseur de services Cloud (CSP)",
+          "L'utilisateur final depuis son navigateur",
+          "L'administrateur système local de l'entreprise cliente",
+          "Aucun acteur, les logiciels SaaS ne sont jamais mis à jour"
+        ],
+        answer: 0,
+        explanation: "En SaaS, le fournisseur gère l'intégralité de la pile matérielle et logicielle (infrastructure, plateforme, application, sécurité et mises à jour)."
+      },
+      {
+        id: "c5_10", chapter: 5, type: "multiple",
+        question: "Parmi les acronymes XaaS suivants cités au Chapitre 5, lesquels sont exacts ?",
+        options: [
+          "DBaaS : Database as a Service",
+          "SECaaS : Security as a Service",
+          "STaaS : Storage as a Service",
+          "NaaS : Network as a Service",
+          "CPUaaS : Cable Power Unit as a Service"
+        ],
+        answer: [0, 1, 2, 3],
+        explanation: "DBaaS, SECaaS, STaaS et NaaS sont des déclinaisons officielles du modèle XaaS présentées au Chapitre 5."
+      },
+
+      // ================= CHAPITRE 6 : TECHNOLOGICAL DRIVERS (10 QCM) =================
+      {
+        id: "c6_1", chapter: 6, type: "single",
+        question: "Dans une architecture orientée services (SOA), quel standard XML est utilisé par le fournisseur pour décrire l'interface et les opérations d'un service web ?",
+        options: [
+          "WSDL (Web Services Description Language)",
+          "UDDI (Universal Description, Discovery and Integration)",
+          "SOAP (Simple Object Access Protocol)",
+          "MPI (Message Passing Interface)"
+        ],
+        answer: 0,
+        explanation: "Dans le triangle SOA : WSDL décrit le service, UDDI sert d'annuaire pour le publier/rechercher, et SOAP/REST sert à l'invoquer."
+      },
+      {
+        id: "c6_2", chapter: 6, type: "single",
+        question: "Quelle est la différence fondamentale entre un stockage NAS et un stockage SAN présentée dans le Chapitre 6 ?",
+        options: [
+          "Le NAS opère au niveau fichier (File-level) via TCP/IP, tandis que le SAN opère au niveau bloc (Block-level) sur un réseau dédié haute vitesse",
+          "Le SAN est uniquement destiné aux particuliers et le NAS aux grands datacenters",
+          "Le NAS ne supporte jamais la technologie RAID",
+          "Le SAN fonctionne exclusivement en Wi-Fi"
+        ],
+        answer: 0,
+        explanation: "NAS (Network Attached Storage) fournit un accès au niveau fichier sur réseau IP, tandis que SAN (Storage Area Network) fournit un accès au niveau bloc haute performance."
+      },
+      {
+        id: "c6_3", chapter: 6, type: "single",
+        question: "Quel modèle de programmation distribuée, créé par Google et composé des phases 'Map' (filtrage/tri) et 'Reduce' (agrégation), est conçu pour traiter de grands volumes de données sur des clusters ?",
+        options: [
+          "MapReduce",
+          "DCOM",
+          "WSDL",
+          "RMI"
+        ],
+        answer: 0,
+        explanation: "MapReduce (créé par Google) et BSP (Bulk Synchronous Parallel) sont les deux modèles de programmation parallèle/distribuée étudiés au Chapitre 6."
+      },
+      {
+        id: "c6_4", chapter: 6, type: "single",
+        question: "Quelle évolution distingue le Web 3.0 du Web 2.0 selon le Chapitre 6 ?",
+        options: [
+          "Le Web 2.0 est le Web social et collaboratif, tandis que le Web 3.0 est le Web sémantique et intelligent compréhensible par les machines",
+          "Le Web 3.0 ne contient que des pages HTML statiques en lecture seule",
+          "Le Web 2.0 a supprimé les réseaux sociaux et les wikis",
+          "Le Web 3.0 fonctionne sans protocole HTTP/HTTPS"
+        ],
+        answer: 0,
+        explanation: "Web 1.0 = Web statique (lecture seule) ; Web 2.0 = Web collaboratif/interactif ; Web 3.0 = Web sémantique et intelligent."
+      },
+      {
+        id: "c6_5", chapter: 6, type: "single",
+        question: "Que signifie l'acronyme RAID dans les technologies de stockage des centres de données ?",
+        options: [
+          "Redundant Array of Independent Disks",
+          "Rapid Access to Internet Data",
+          "Remote Architecture for Integrated Datacenters",
+          "Resource Allocation in Distributed Systems"
+        ],
+        answer: 0,
+        explanation: "RAID signifie 'Redundant Array of Independent Disks' (regroupement redondant de disques indépendants) pour améliorer la tolérance aux pannes et les performances."
+      },
+      {
+        id: "c6_6", chapter: 6, type: "single",
+        question: "Quel modèle de programmation parallèle, alternative à MapReduce citée dans le Chapitre 6, organise le calcul en super-étapes (supersteps) synchronisées par barrière ?",
+        options: [
+          "BSP (Bulk Synchronous Parallel)",
+          "SOAP (Simple Object Access Protocol)",
+          "DCB (Data Center Bridging)",
+          "RAID 5"
+        ],
+        answer: 0,
+        explanation: "Le modèle BSP (Bulk Synchronous Parallel) structure les algorithmes parallèles en super-étapes composées de calcul local, communication et synchronisation par barrière."
+      },
+      {
+        id: "c6_7", chapter: 6, type: "single",
+        question: "Dans le triangle SOA, quel composant joue le rôle d'annuaire permettant aux demandeurs de découvrir les services web disponibles ?",
+        options: [
+          "UDDI (Universal Description, Discovery and Integration)",
+          "WSDL",
+          "Hyperviseur Type 1",
+          "Fibre Channel"
+        ],
+        answer: 0,
+        explanation: "UDDI est le registre/annuaire dans lequel le fournisseur publie le service et où le client le recherche (Find)."
+      },
+      {
+        id: "c6_8", chapter: 6, type: "single",
+        question: "Quelle technologie réseau (DCB) est mentionnée au Chapitre 6 pour améliorer Ethernet dans les centres de données afin de transporter sans perte le trafic de stockage (FCoE) et de calcul ?",
+        options: [
+          "Data Center Bridging",
+          "Dynamic Cloud Billing",
+          "Distributed Computing Bus",
+          "Direct Client Browser"
+        ],
+        answer: 0,
+        explanation: "DCB (Data Center Bridging) est un ensemble d'extensions IEEE à Ethernet permettant un transport sans perte (lossless) et la convergence réseau/stockage dans les datacenters."
+      },
+      {
+        id: "c6_9", chapter: 6, type: "multiple",
+        question: "Parmi les moteurs technologiques du Cloud Computing présentés au Chapitre 6, lesquels figurent dans le cours ?",
+        options: [
+          "La virtualisation et les processeurs multicœurs (Multicore)",
+          "L'architecture orientée services (SOA / Web Services)",
+          "Les technologies de stockage (SAN, NAS, RAID) et réseau (DCB)",
+          "Les méthodes de développement Agile (SDLC) et modèles Big Data (MapReduce, BSP)",
+          "Les disquettes magnétiques 3,5 pouces"
+        ],
+        answer: [0, 1, 2, 3],
+        explanation: "Tous ces éléments sont les piliers technologiques qui ont rendu le Cloud Computing techniquement et économiquement viable."
+      },
+      {
+        id: "c6_10", chapter: 6, type: "single",
+        question: "Pourquoi les méthodes de développement logiciel Agile (SDLC Agile) sont-elles considérées comme un moteur du Cloud Computing ?",
+        options: [
+          "Elles permettent des cycles de développement itératifs rapides et un déploiement continu parfaitement adaptés à l'élasticité du Cloud",
+          "Elles interdisent toute modification du logiciel après la phase initiale",
+          "Elles nécessitent d'attendre 2 ans avant de tester une application",
+          "Elles remplacent complètement les serveurs par des feuilles papier"
+        ],
+        answer: 0,
+        explanation: "Le développement Agile favorise la livraison rapide, l'intégration continue et l'adaptation rapide aux besoins, en synergie directe avec le provisionnement instantané du Cloud."
+      },
+
+      // ================= CHAPITRE 7 : VIRTUALIZATION (11 QCM) =================
+      {
+        id: "c7_1", chapter: 7, type: "single",
+        question: "Dans l'architecture des anneaux de protection (Protection Rings) d'un processeur x86 non virtualisé, à quel niveau s'exécute le noyau du système d'exploitation (OS Kernel) ?",
+        options: [
+          "Ring 0 (le niveau le plus privilégié)",
+          "Ring 1",
+          "Ring 2",
+          "Ring 3 (espace utilisateur)"
+        ],
+        answer: 0,
+        explanation: "Le noyau de l'OS s'exécute au Ring 0 (privilège maximal), les pilotes de périphériques aux Rings 1 et 2, et les applications utilisateurs au Ring 3."
+      },
+      {
+        id: "c7_2", chapter: 7, type: "single",
+        question: "Comment fonctionne la 'Full Virtualization' (virtualisation complète) sur architecture x86 sans assistance matérielle ?",
+        options: [
+          "L'hyperviseur s'exécute au Ring 0, place l'OS invité au Ring 1 et effectue une traduction binaire (Binary Translation) des instructions sensibles non virtualisables",
+          "Le code source du noyau de l'OS invité est modifié pour appeler l'hyperviseur via des hypercalls",
+          "L'OS invité s'exécute directement au Ring 0 sans hyperviseur",
+          "Aucune instruction n'est interceptée par le VMM"
+        ],
+        answer: 0,
+        explanation: "En Full Virtualization, l'OS invité n'est pas modifié ; le VMM au Ring 0 intercepte et traduit dynamiquement (binary translation) les instructions privilégiées émises depuis le Ring 1."
+      },
+      {
+        id: "c7_3", chapter: 7, type: "single",
+        question: "Quelle approche de virtualisation exige de modifier le noyau du système d'exploitation invité afin qu'il remplace les instructions non virtualisables par des 'Hypercalls' directs vers l'hyperviseur ?",
+        options: [
+          "La Paravirtualisation (Paravirtualization)",
+          "La Virtualisation complète (Full Virtualization)",
+          "La Virtualisation assistée par le matériel (Hardware-Assisted)",
+          "La Virtualisation d'application"
+        ],
+        answer: 0,
+        explanation: "La Paravirtualisation (popularisée par Xen) modifie l'OS invité pour utiliser des 'Hypercalls', ce qui évite le coût de la traduction binaire et améliore les performances."
+      },
+      {
+        id: "c7_4", chapter: 7, type: "single",
+        question: "Quel avantage apporte la virtualisation assistée par le matériel (Intel VT-x / AMD-V) ?",
+        options: [
+          "Elle introduit un mode Root (pour le VMM) et Non-Root (pour l'OS invité au Ring 0), permettant aux appels sensibles de basculer (trap) directement vers le VMM sans traduction binaire ni modification de l'OS",
+          "Elle supprime le besoin d'avoir de la mémoire RAM sur le serveur",
+          "Elle oblige tous les systèmes invités à utiliser le même noyau Linux",
+          "Elle transforme tout hyperviseur de Type 2 en système sans OS hôte"
+        ],
+        answer: 0,
+        explanation: "Avec Intel VT-x / AMD-V, le processeur gère nativement le basculement (VM Exit / trap) vers le VMM en mode Root, éliminant la traduction binaire et la modification de l'OS invité."
+      },
+      {
+        id: "c7_5", chapter: 7, type: "multiple",
+        question: "Parmi les hyperviseurs suivants, lesquels appartiennent à la catégorie Type 1 (Bare-Metal) ?",
+        options: [
+          "VMware ESXi",
+          "Microsoft Hyper-V",
+          "Citrix XenServer",
+          "Oracle VirtualBox",
+          "VMware Workstation"
+        ],
+        answer: [0, 1, 2],
+        explanation: "VMware ESXi, Microsoft Hyper-V et XenServer s'exécutent directement sur le matériel (Type 1). VirtualBox et VMware Workstation s'installent sur un OS hôte (Type 2)."
+      },
+      {
+        id: "c7_6", chapter: 7, type: "single",
+        question: "Quelle affirmation compare correctement les hyperviseurs de Type 1 et de Type 2 ?",
+        options: [
+          "Le Type 1 (Bare-Metal) s'exécute directement sur le matériel et offre de meilleures performances et sécurité que le Type 2 qui dépend d'un OS hôte",
+          "Le Type 2 s'exécute directement sur le matériel sans aucun système d'exploitation hôte",
+          "Le Type 1 est uniquement utilisé pour des tests sur ordinateur portable personnel",
+          "Le Type 2 offre toujours une latence plus faible que le Type 1"
+        ],
+        answer: 0,
+        explanation: "L'hyperviseur Type 1 accède directement au matériel (idéal pour les datacenters), alors que le Type 2 passe par un OS hôte (ce qui ajoute une couche logicielle et une surface d'attaque)."
+      },
+      {
+        id: "c7_7", chapter: 7, type: "multiple",
+        question: "Quels sont les deux principaux vecteurs d'attaques de sécurité spécifiques aux environnements virtualisés présentés au Chapitre 7 ?",
+        options: [
+          "Les attaques via le système d'exploitation hôte (Host OS)",
+          "Les attaques via le système d'exploitation invité (Guest OS / VM Escape)",
+          "La surcharge électrique des câbles RJ45",
+          "La fragmentation des adresses IPv4"
+        ],
+        answer: [0, 1],
+        explanation: "Le Chapitre 7 identifie deux menaces majeures : la compromission via le Host OS (qui contrôle tout) et les attaques depuis un Guest OS malveillant (évasion de VM vers l'hyperviseur ou les VMs voisines)."
+      },
+      {
+        id: "c7_8", chapter: 7, type: "multiple",
+        question: "Quels sont les deux principes fondamentaux qu'une plateforme de virtualisation doit respecter pour être utile en production (Chapitre 7 / TD) ?",
+        options: [
+          "L'Isolation (une panne ou attaque sur une VM n'affecte pas les autres VMs)",
+          "La Transparence / Équivalence (l'environnement virtuel se comporte comme le matériel réel)",
+          "L'obligation d'utiliser le même OS sur toutes les machines virtuelles",
+          "La suppression de toute isolation mémoire entre locataires"
+        ],
+        answer: [0, 1],
+        explanation: "Les deux principes fondamentaux sont l'Isolation entre machines virtuelles et la Transparence vis-à-vis des systèmes d'exploitation et applications."
+      },
+      {
+        id: "c7_9", chapter: 7, type: "single",
+        question: "Que désigne la virtualisation du stockage (Storage Virtualization) illustrée dans le cours ?",
+        options: [
+          "Le regroupement de plusieurs périphériques de stockage physique hétérogènes en un volume logique unique (Virtual Volume) géré par une couche d'abstraction",
+          "La suppression de tous les disques durs physiques dans le datacenter",
+          "L'exécution d'un navigateur web sans carte réseau",
+          "La traduction binaire des instructions du processeur x86"
+        ],
+        answer: 0,
+        explanation: "La virtualisation du stockage abstrait les disques physiques (Physical Storage) via un moteur de placement (Data Placement Engine) pour exposer des volumes virtuels avec snapshots et réplication."
+      },
+      {
+        id: "c7_10", chapter: 7, type: "multiple",
+        question: "Quelles bonnes pratiques de sécurité (durcissement) sont recommandées au Chapitre 7 pour sécuriser un environnement virtualisé ?",
+        options: [
+          "Maintenir à jour l'hyperviseur et l'OS hôte (patch management)",
+          "Désactiver les services et périphériques virtuels inutilisés sur les VMs",
+          "Segmenter le réseau de gestion de l'hyperviseur du trafic des VMs",
+          "Partager le même mot de passe administrateur entre toutes les VMs"
+        ],
+        answer: [0, 1, 2],
+        explanation: "Le durcissement impose de patcher régulièrement le VMM/Host OS, désactiver les périphériques inutiles et isoler le réseau d'administration."
+      },
+      {
+        id: "c7_11", chapter: 7, type: "single",
+        question: "Dans une architecture x86 standard non virtualisée, à quel anneau de protection (Ring) s'exécutent les applications utilisateurs ?",
+        options: [
+          "Ring 3 (le niveau le moins privilégié)",
+          "Ring 0",
+          "Ring 1",
+          "Ring -1 (Mode Root)"
+        ],
+        answer: 0,
+        explanation: "Les applications utilisateurs s'exécutent dans l'espace utilisateur (User space) au Ring 3."
+      },
+
+      // ================= CHAPITRE 8 : SERVICE LEVEL AGREEMENT (9 QCM) =================
+      {
+        id: "c8_1", chapter: 8, type: "single",
+        question: "Quelle proposition décrit correctement la relation entre SLA, SLO, SLI et KPI au Chapitre 8 ?",
+        options: [
+          "Les KPI alimentent les SLI (mesures réelles), qui sont comparés aux SLO (objectifs), lesquels sont inscrits dans le contrat SLA",
+          "Le KPI est le contrat juridique signé entre le client et le fournisseur",
+          "Le SLA est une métrique matérielle de bas niveau mesurant la température du processeur",
+          "Le SLO désigne uniquement la facture mensuelle envoyée au client"
+        ],
+        answer: 0,
+        explanation: "Hiérarchie : KPI (métriques bas niveau) → SLI (indicateur réel mesuré) → SLO (objectif cible) → SLA (contrat formel avec pénalités)."
+      },
+      {
+        id: "c8_2", chapter: 8, type: "single",
+        question: "Un fournisseur Cloud garantit un taux de disponibilité (Uptime) annuel de 99,9 % (ex: Microsoft 365). À quelle durée maximale d'indisponibilité (Downtime) par an cela correspond-il environ ?",
+        options: [
+          "Environ 8,76 heures par an",
+          "Environ 52,6 minutes par an",
+          "Environ 4,38 heures par an",
+          "Environ 3,65 jours par an"
+        ],
+        answer: 0,
+        explanation: "Une année compte 8 760 heures. 0,1 % d'indisponibilité = 8 760 × 0,001 = 8,76 heures par an (soit ~43,8 minutes/mois)."
+      },
+      {
+        id: "c8_3", chapter: 8, type: "single",
+        question: "Quelle durée maximale d'interruption annuelle correspond à un SLA de 99,99 % (ex: Azure Availability Zone) ?",
+        options: [
+          "Environ 52,6 minutes par an",
+          "Environ 8,76 heures par an",
+          "Environ 26,3 minutes par an",
+          "Environ 4,38 heures par an"
+        ],
+        answer: 0,
+        explanation: "99,99 % de disponibilité laisse 0,01 % d'indisponibilité : 8 760 heures × 60 min × 0,0001 = 52,56 minutes par an."
+      },
+      {
+        id: "c8_4", chapter: 8, type: "single",
+        question: "Quel type de SLA s'applique de manière identique et standardisée à tous les clients souscrivant à un même service Cloud ?",
+        options: [
+          "Service-based SLA",
+          "Customer-based SLA",
+          "Multi-level SLA",
+          "Hardware-based SLA"
+        ],
+        answer: 0,
+        explanation: "Un Service-based SLA définit un niveau de service uniforme pour tous les clients d'un service donné, contrairement au Customer-based SLA négocié pour un client précis."
+      },
+      {
+        id: "c8_5", chapter: 8, type: "single",
+        question: "Quels sont les trois niveaux qui composent un 'Multi-level SLA' selon le Chapitre 8 ?",
+        options: [
+          "Corporate level, Customer level et Service level",
+          "Hardware level, Network level et Application level",
+          "IaaS level, PaaS level et SaaS level",
+          "Ring 0, Ring 1 et Ring 3"
+        ],
+        answer: 0,
+        explanation: "Le Multi-level SLA est structuré en 3 niveaux : Corporate level (global), Customer level (spécifique au client) et Service level (spécifique au service)."
+      },
+      {
+        id: "c8_6", chapter: 8, type: "multiple",
+        question: "Parmi les éléments suivants, lesquels font partie des exigences critiques d'un Cloud SLA mentionnées au Chapitre 8 ?",
+        options: [
+          "L'auditabilité par un tiers neutre (Neutral third-party auditability)",
+          "L'effacement sécurisé des supports lors de la résiliation (Zero out memory & disk platters)",
+          "La juridiction légale et la localisation des données",
+          "La procédure en cas de saisie légale (Data seizure) sur un serveur multi-locataire",
+          "La fourniture gratuite d'ordinateurs portables aux employés du client"
+        ],
+        answer: [0, 1, 2, 3],
+        explanation: "Un Cloud SLA robuste doit encadrer l'auditabilité par un tiers neutre, l'effacement physique/logique des mémoires et disques (zero out), la juridiction applicable et la gestion des saisies judiciaires."
+      },
+      {
+        id: "c8_7", chapter: 8, type: "single",
+        question: "Quels sont les deux langages / standards XML de spécification formelle des SLA cités dans le Chapitre 8 ?",
+        options: [
+          "WS-Agreement et WSLA (Web Service Level Agreement)",
+          "HTML5 et CSS3",
+          "MPI et OpenMP",
+          "UDDI et SMTP"
+        ],
+        answer: 0,
+        explanation: "WS-Agreement (de l'OGF) et WSLA (d'IBM) sont les deux standards de spécification formelle des SLA présentés dans le cours."
+      },
+      {
+        id: "c8_8", chapter: 8, type: "single",
+        question: "Quelle différence distingue la Disponibilité (Availability) de la Fiabilité (Reliability) dans les métriques SLA ?",
+        options: [
+          "La disponibilité mesure le pourcentage de temps où le système est opérationnel, tandis que la fiabilité mesure la probabilité qu'il fonctionne sans défaillance sur une période donnée",
+          "La fiabilité mesure uniquement le prix de l'abonnement mensuel",
+          "La disponibilité désigne la vitesse du processeur en GHz",
+          "Il n'y a aucune distinction entre ces deux métriques"
+        ],
+        answer: 0,
+        explanation: "Availability = temps opérationnel / temps total (Uptime) ; Reliability = capacité à fonctionner sans interruption/panne sur un intervalle donné (MTBF)."
+      },
+      {
+        id: "c8_9", chapter: 8, type: "single",
+        question: "Dans un SLO de reprise d'activité après sinistre, que mesure le RTO (Recovery Time Objective) ?",
+        options: [
+          "La durée maximale admissible d'interruption d'un service avant sa restauration complète après une panne",
+          "La quantité maximale de données pouvant être perdues mesurée en temps",
+          "Le nombre maximal de machines virtuelles par serveur physique",
+          "Le temps nécessaire pour installer un navigateur web sur un client léger"
+        ],
+        answer: 0,
+        explanation: "Le RTO (Recovery Time Objective) fixe le délai maximal toléré pour rétablir le service après un incident, tandis que le RPO (Recovery Point Objective) fixe la perte maximale de données admissible."
+      }
+    ];
+
+    // ==================== ÉTAT DE L'APPLICATION ====================
+    const EXAM_DURATION_SECONDS = 25 * 60; // 25 minutes strictes (1500 secondes)
+    let currentQuestions = [];
+    let userAnswers = [];
+    let flaggedQuestions = [];
+    let currentIndex = 0;
+    let remainingSeconds = EXAM_DURATION_SECONDS;
+    let timerInterval = null;
+    let isExamFinished = false;
+    let lastSelectedChapter = "ALL";
+
+    // ==================== FONCTIONS UTILITAIRES ====================
+    function shuffleArray(array) {
+      const arr = [...array];
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    function formatTime(totalSeconds) {
+      const mins = Math.floor(totalSeconds / 60);
+      const secs = totalSeconds % 60;
+      return `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+    }
+
+    // Prépare chaque QCM en mélangeant systématiquement l'ordre des propositions
+    function prepareQuestionInstance(q) {
+      const instance = JSON.parse(JSON.stringify(q));
+
+      if (instance.type === "single") {
+        const indexed = instance.options.map((text, idx) => ({ text, isCorrect: idx === instance.answer }));
+        const shuffled = shuffleArray(indexed);
+        instance.shuffledOptions = shuffled.map(o => o.text);
+        instance.correctIndex = shuffled.findIndex(o => o.isCorrect);
+      } else if (instance.type === "multiple") {
+        const indexed = instance.options.map((text, idx) => ({ text, isCorrect: instance.answer.includes(idx) }));
+        const shuffled = shuffleArray(indexed);
+        instance.shuffledOptions = shuffled.map(o => o.text);
+        instance.correctIndices = shuffled
+          .map((o, idx) => (o.isCorrect ? idx : -1))
+          .filter(idx => idx !== -1);
+      }
+
+      return instance;
+    }
+
+    // ==================== DÉMARRAGE DE L'EXAMEN ====================
+    function startExam() {
+      lastSelectedChapter = document.getElementById("chapter-select").value;
+      let pool = QUESTION_BANK;
+
+      if (lastSelectedChapter !== "ALL") {
+        const chNum = parseInt(lastSelectedChapter, 10);
+        pool = QUESTION_BANK.filter(q => q.chapter === chNum);
+      }
+
+      // Tirage aléatoire de 25 QCM maximum et mélange des propositions
+      const selected = shuffleArray(pool).slice(0, 25);
+      currentQuestions = selected.map(prepareQuestionInstance);
+
+      userAnswers = currentQuestions.map(q => (q.type === "multiple" ? [] : null));
+      flaggedQuestions = new Array(currentQuestions.length).fill(false);
+      currentIndex = 0;
+      isExamFinished = false;
+
+      remainingSeconds = EXAM_DURATION_SECONDS;
+      updateTimerUI();
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(tickTimer, 1000);
+
+      document.getElementById("view-home").classList.add("hidden");
+      document.getElementById("view-results").classList.add("hidden");
+      const examView = document.getElementById("view-exam");
+      examView.classList.remove("hidden");
+      examView.classList.add("grid");
+
+      document.getElementById("header-home-container").classList.add("hidden");
+      const timerContainer = document.getElementById("header-timer-container");
+      timerContainer.classList.remove("hidden");
+      timerContainer.classList.add("flex");
+
+      renderQuestionGrid();
+      renderCurrentQuestion();
+      updateProgress();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function restartSameSettings() {
+      startExam();
+    }
+
+    function returnToHome() {
+      if (timerInterval) clearInterval(timerInterval);
+      document.getElementById("view-exam").classList.add("hidden");
+      document.getElementById("view-exam").classList.remove("grid");
+      document.getElementById("view-results").classList.add("hidden");
+      document.getElementById("view-home").classList.remove("hidden");
+
+      document.getElementById("header-timer-container").classList.add("hidden");
+      document.getElementById("header-timer-container").classList.remove("flex");
+      document.getElementById("header-home-container").classList.add("hidden");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    // ==================== GESTION DU CHRONOMÈTRE ====================
+    function tickTimer() {
+      if (isExamFinished) return;
+      remainingSeconds--;
+      updateTimerUI();
+
+      if (remainingSeconds <= 0) {
+        clearInterval(timerInterval);
+        finishExam(true); // Soumission automatique à la fin des 25 minutes
+      }
+    }
+
+    function updateTimerUI() {
+      const display = document.getElementById("timer-display");
+      const badge = document.getElementById("timer-badge");
+      display.textContent = formatTime(Math.max(0, remainingSeconds));
+
+      // Alertes visuelles à < 5 min et < 1 min
+      badge.classList.remove(
+        "bg-slate-100", "border-slate-200", "text-slate-800",
+        "bg-amber-100", "border-amber-400", "text-amber-900",
+        "bg-rose-100", "border-rose-500", "text-rose-800", "timer-urgent"
+      );
+
+      if (remainingSeconds <= 60) {
+        badge.classList.add("bg-rose-100", "border-rose-500", "text-rose-800", "timer-urgent");
+      } else if (remainingSeconds <= 300) {
+        badge.classList.add("bg-amber-100", "border-amber-400", "text-amber-900");
+      } else {
+        badge.classList.add("bg-slate-100", "border-slate-200", "text-slate-800");
+      }
+    }
+
+    // ==================== RENDU DES QUESTIONS ====================
+    function renderCurrentQuestion() {
+      const q = currentQuestions[currentIndex];
+      const total = currentQuestions.length;
+
+      // Badges d'en-tête
+      document.getElementById("q-number-badge").textContent = `Question ${currentIndex + 1} / ${total}`;
+      document.getElementById("q-chapter-badge").textContent = CHAPTER_NAMES[q.chapter];
+
+      const typeLabels = {
+        single: "Choix Unique (QCM)",
+        multiple: "Choix Multiples (QRM)",
+        boolean: "Vrai ou Faux",
+        fill: "Texte à trous / Terme clé",
+        match: "Association de concepts"
+      };
+      const typeInstructions = {
+        single: "Cochez la seule bonne réponse parmi les propositions ci-dessous.",
+        multiple: "Attention : plusieurs réponses sont exactes. Cochez toutes les bonnes affirmations.",
+        boolean: "Indiquez si l'affirmation tirée du cours est Vraie ou Fausse.",
+        fill: "Saisissez le terme technique exact attendu (insensible aux majuscules/accents).",
+        match: "Associez chaque élément de gauche à sa correspondance exacte à droite."
+      };
+
+      document.getElementById("q-type-badge").textContent = typeLabels[q.type];
+      document.getElementById("q-text").textContent = q.question;
+      document.getElementById("q-instruction").textContent = typeInstructions[q.type];
+
+      // Rendu des options selon le type
+      const container = document.getElementById("q-options-container");
+      container.innerHTML = "";
+
+      if (q.type === "single") {
+        q.shuffledOptions.forEach((optText, idx) => {
+          const isSelected = userAnswers[currentIndex] === idx;
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.onclick = () => selectSingleOption(idx);
+          btn.className = `w-full text-left p-4 rounded-xl border-2 transition flex items-start gap-3.5 cursor-pointer ${
+            isSelected
+              ? "border-blue-600 bg-blue-50/70 text-slate-900 font-medium"
+              : "border-slate-200 hover:border-blue-300 hover:bg-slate-50 text-slate-700"
+          }`;
+
+          const letter = String.fromCharCode(65 + idx);
+          btn.innerHTML = `
+            <span class="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold shrink-0 mt-0.5 ${
+              isSelected ? "bg-blue-600 text-white" : "bg-slate-100 text-slate-600"
+            }">${letter}</span>
+            <span class="text-sm sm:text-base leading-snug">${optText}</span>
+          `;
+          container.appendChild(btn);
+        });
+      } else if (q.type === "multiple") {
+        const selectedArr = userAnswers[currentIndex] || [];
+        q.shuffledOptions.forEach((optText, idx) => {
+          const isSelected = selectedArr.includes(idx);
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.onclick = () => toggleMultipleOption(idx);
+          btn.className = `w-full text-left p-4 rounded-xl border-2 transition flex items-start gap-3.5 cursor-pointer ${
+            isSelected
+              ? "border-indigo-600 bg-indigo-50/70 text-slate-900 font-medium"
+              : "border-slate-200 hover:border-indigo-300 hover:bg-slate-50 text-slate-700"
+          }`;
+
+          btn.innerHTML = `
+            <span class="w-6 h-6 rounded-md border-2 flex items-center justify-center shrink-0 mt-0.5 ${
+              isSelected ? "bg-indigo-600 border-indigo-600 text-white" : "border-slate-300 bg-white"
+            }">
+              ${isSelected ? '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>' : ""}
+            </span>
+            <span class="text-sm sm:text-base leading-snug">${optText}</span>
+          `;
+          container.appendChild(btn);
+        });
+      } else if (q.type === "boolean") {
+        const choices = [
+          { val: true, label: "VRAI", desc: "Cette affirmation est conforme au cours" },
+          { val: false, label: "FAUX", desc: "Cette affirmation est inexacte" }
+        ];
+        choices.forEach(ch => {
+          const isSelected = userAnswers[currentIndex] === ch.val;
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.onclick = () => selectBooleanOption(ch.val);
+          btn.className = `w-full text-left p-4 rounded-xl border-2 transition flex items-center justify-between gap-4 cursor-pointer ${
+            isSelected
+              ? "border-blue-600 bg-blue-50/70 text-slate-900"
+              : "border-slate-200 hover:border-blue-300 hover:bg-slate-50 text-slate-700"
+          }`;
+          btn.innerHTML = `
+            <div>
+              <div class="font-bold text-base">${ch.label}</div>
+              <div class="text-xs text-slate-500 mt-0.5">${ch.desc}</div>
+            </div>
+            <div class="w-6 h-6 rounded-full border-2 flex items-center justify-center ${
+              isSelected ? "border-blue-600 bg-blue-600" : "border-slate-300"
+            }">
+              ${isSelected ? '<span class="w-2.5 h-2.5 rounded-full bg-white"></span>' : ""}
+            </div>
+    // ==================== RENDU DES QUESTIONS (100% QCM) ====================
+    function renderCurrentQuestion() {
+      const q = currentQuestions[currentIndex];
+      const total = currentQuestions.length;
+
+      document.getElementById("q-number-badge").textContent = `Question ${currentIndex + 1} / ${total}`;
+      document.getElementById("q-chapter-badge").textContent = CHAPTER_NAMES[q.chapter];
+
+      const typeBadge = document.getElementById("q-type-badge");
+      if (q.type === "single") {
+        typeBadge.textContent = "QCM — Choix unique";
+        typeBadge.className = "px-2.5 py-1 rounded-lg bg-blue-50 text-blue-700 text-xs font-semibold";
+        document.getElementById("q-instruction").textContent = "Sélectionnez la seule bonne réponse parmi les propositions ci-dessous.";
+      } else {
+        typeBadge.textContent = "QCM — Choix multiples";
+        typeBadge.className = "px-2.5 py-1 rounded-lg bg-indigo-50 text-indigo-700 text-xs font-semibold";
+        document.getElementById("q-instruction").textContent = "Plusieurs réponses sont exactes : cochez toutes les bonnes propositions.";
+      }
+
+      document.getElementById("q-text").textContent = q.question;
+
+      const container = document.getElementById("q-options-container");
+      container.innerHTML = "";
+
+      if (q.type === "single") {
+        q.shuffledOptions.forEach((optText, idx) => {
+          const isSelected = userAnswers[currentIndex] === idx;
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.onclick = () => selectSingleOption(idx);
+          btn.className = `w-full text-left p-4 rounded-xl border-2 transition flex items-start gap-3.5 cursor-pointer ${
+            isSelected
+              ? "border-blue-600 bg-blue-50/70 text-slate-900 font-medium"
+              : "border-slate-200 hover:border-blue-300 hover:bg-slate-50 text-slate-700"
+          }`;
+
+          const letter = String.fromCharCode(65 + idx);
+          btn.innerHTML = `
+            <span class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0 mt-0.5 border ${
+              isSelected ? "bg-blue-600 border-blue-600 text-white" : "bg-slate-100 border-slate-300 text-slate-600"
+            }">${letter}</span>
+            <span class="text-sm sm:text-base leading-snug">${optText}</span>
+          `;
+          container.appendChild(btn);
+        });
+      } else {
+        const selectedArr = userAnswers[currentIndex] || [];
+        q.shuffledOptions.forEach((optText, idx) => {
+          const isSelected = selectedArr.includes(idx);
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.onclick = () => toggleMultipleOption(idx);
+          btn.className = `w-full text-left p-4 rounded-xl border-2 transition flex items-start gap-3.5 cursor-pointer ${
+            isSelected
+              ? "border-indigo-600 bg-indigo-50/70 text-slate-900 font-medium"
+              : "border-slate-200 hover:border-indigo-300 hover:bg-slate-50 text-slate-700"
+          }`;
+
+          const letter = String.fromCharCode(65 + idx);
+          btn.innerHTML = `
+            <span class="w-6 h-6 rounded-md border-2 flex items-center justify-center shrink-0 mt-0.5 ${
+              isSelected ? "bg-indigo-600 border-indigo-600 text-white" : "border-slate-300 bg-white text-slate-500 text-xs font-bold"
+            }">
+              ${isSelected ? '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>' : letter}
+            </span>
+            <span class="text-sm sm:text-base leading-snug">${optText}</span>
+          `;
+          container.appendChild(btn);
+        });
+      }
+
+      document.getElementById("btn-prev").disabled = currentIndex === 0;
+      const nextBtn = document.getElementById("btn-next");
+      if (currentIndex === total - 1) {
+        nextBtn.textContent = "Terminer le CC ✓";
+        nextBtn.classList.remove("bg-blue-600", "hover:bg-blue-700");
+        nextBtn.classList.add("bg-emerald-600", "hover:bg-emerald-700");
+        nextBtn.onclick = openConfirmModal;
+      } else {
+        nextBtn.textContent = "Suivante →";
+        nextBtn.classList.remove("bg-emerald-600", "hover:bg-emerald-700");
+        nextBtn.classList.add("bg-blue-600", "hover:bg-blue-700");
+        nextBtn.onclick = nextQuestion;
+      }
+
+      const flagBtnText = document.getElementById("btn-flag-text");
+      flagBtnText.textContent = flaggedQuestions[currentIndex] ? "Retirer le drapeau" : "Marquer à revoir";
+
+      renderQuestionGrid();
+    }
+
+    // ==================== INTERACTIONS UTILISATEUR ====================
+    function selectSingleOption(idx) {
+      userAnswers[currentIndex] = idx;
+      renderCurrentQuestion();
+      updateProgress();
+    }
+
+    function toggleMultipleOption(idx) {
+      let arr = userAnswers[currentIndex] || [];
+      if (arr.includes(idx)) {
+        arr = arr.filter(i => i !== idx);
+      } else {
+        arr = [...arr, idx];
+      }
+      userAnswers[currentIndex] = arr;
+      renderCurrentQuestion();
+      updateProgress();
+    }
+
+    function toggleFlag() {
+      flaggedQuestions[currentIndex] = !flaggedQuestions[currentIndex];
+      renderCurrentQuestion();
+    }
+
+    function prevQuestion() {
+      if (currentIndex > 0) {
+        currentIndex--;
+        renderCurrentQuestion();
+      }
+    }
+
+    function nextQuestion() {
+      if (currentIndex < currentQuestions.length - 1) {
+        currentIndex++;
+        renderCurrentQuestion();
+      }
+    }
+
+    function jumpToQuestion(idx) {
+      currentIndex = idx;
+      renderCurrentQuestion();
+    }
+
+    function isQuestionAnswered(idx) {
+      const q = currentQuestions[idx];
+      const ans = userAnswers[idx];
+      if (q.type === "single") return ans !== null && ans !== undefined;
+      if (q.type === "multiple") return Array.isArray(ans) && ans.length > 0;
+      return false;
+    }
+
+    function renderQuestionGrid() {
+      const grid = document.getElementById("question-grid");
+      grid.innerHTML = "";
+      currentQuestions.forEach((_, idx) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.textContent = idx + 1;
+        btn.onclick = () => jumpToQuestion(idx);
+
+        const isCurrent = idx === currentIndex;
+        const isFlagged = flaggedQuestions[idx];
+        const isAnswered = isQuestionAnswered(idx);
+
+        let classes = "h-9 rounded-lg text-xs font-bold transition flex items-center justify-center cursor-pointer ";
+        if (isCurrent) {
+          classes += "bg-blue-600 text-white ring-2 ring-blue-300";
+        } else if (isFlagged) {
+          classes += "bg-amber-100 text-amber-900 border border-amber-400";
+        } else if (isAnswered) {
+          classes += "bg-emerald-100 text-emerald-900 border border-emerald-400";
+        } else {
+          classes += "bg-slate-100 text-slate-600 border border-slate-200 hover:bg-slate-200";
+        }
+
+        btn.className = classes;
+        grid.appendChild(btn);
+      });
+    }
+
+    function updateProgress() {
+      const total = currentQuestions.length;
+      let answeredCount = 0;
+      for (let i = 0; i < total; i++) {
+        if (isQuestionAnswered(i)) answeredCount++;
+      }
+      document.getElementById("progress-text").textContent = `${answeredCount} / ${total} répondues`;
+      const pct = Math.round((answeredCount / total) * 100);
+      document.getElementById("progress-bar").style.width = `${pct}%`;
+    }
+
+    // ==================== MODALE & SOUMISSION ====================
+    function openConfirmModal() {
+      const total = currentQuestions.length;
+      let unanswered = 0;
+      for (let i = 0; i < total; i++) {
+        if (!isQuestionAnswered(i)) unanswered++;
+      }
+      const warningEl = document.getElementById("modal-unanswered-warning");
+      if (unanswered > 0) {
+        warningEl.innerHTML = `Attention : il vous reste <strong>${unanswered} question(s) non répondue(s)</strong> (ou incomplète(s)). Voulez-vous tout de même soumettre votre copie ?`;
+      } else {
+        warningEl.textContent = "Toutes les questions ont reçu une réponse. Confirmez-vous la soumission définitive de votre CC ?";
+      }
+      const modal = document.getElementById("confirm-modal");
+      modal.classList.remove("hidden");
+      modal.classList.add("flex");
+    }
+
+    function closeConfirmModal() {
+      const modal = document.getElementById("confirm-modal");
+      modal.classList.add("hidden");
+      modal.classList.remove("flex");
+    }
+
+    // Évalue une question et renvoie true si 100% juste
+    function evaluateQuestion(idx) {
+      const q = currentQuestions[idx];
+      const ans = userAnswers[idx];
+
+      if (q.type === "single") {
+        return ans === q.correctIndex;
+      }
+      if (q.type === "boolean") {
+        return ans === q.answer;
+      }
+      if (q.type === "multiple") {
+    // Évalue un QCM et renvoie true si 100% juste
+    function evaluateQuestion(idx) {
+      const q = currentQuestions[idx];
+      const ans = userAnswers[idx];
+
+      if (q.type === "single") {
+        return ans === q.correctIndex;
+      }
+      if (q.type === "multiple") {
+        if (!Array.isArray(ans) || ans.length !== q.correctIndices.length) return false;
+        const sortedUser = [...ans].sort();
+        const sortedCorrect = [...q.correctIndices].sort();
+        return sortedUser.every((val, i) => val === sortedCorrect[i]);
+      }
+      return false;
+    }
+
+    function finishExam(isTimeout) {
+      if (isExamFinished) return;
+      isExamFinished = true;
+      closeConfirmModal();
+      if (timerInterval) clearInterval(timerInterval);
+
+      const elapsedSeconds = EXAM_DURATION_SECONDS - Math.max(0, remainingSeconds);
+      const total = currentQuestions.length;
+      let correctCount = 0;
+
+      // Statistiques par chapitre
+      const chapterStats = {};
+      for (let c = 1; c <= 8; c++) {
+        chapterStats[c] = { total: 0, correct: 0 };
+      }
+
+      const resultsData = currentQuestions.map((q, idx) => {
+        const isCorrect = evaluateQuestion(idx);
+        if (isCorrect) correctCount++;
+        chapterStats[q.chapter].total++;
+        if (isCorrect) chapterStats[q.chapter].correct++;
+        return { q, idx, isCorrect };
+      });
+
+      // Affichage de la vue résultats
+      document.getElementById("view-exam").classList.add("hidden");
+      document.getElementById("view-exam").classList.remove("grid");
+      document.getElementById("view-results").classList.remove("hidden");
+
+      document.getElementById("header-timer-container").classList.add("hidden");
+      document.getElementById("header-timer-container").classList.remove("flex");
+      document.getElementById("header-home-container").classList.remove("hidden");
+
+      const timeoutBanner = document.getElementById("timeout-banner");
+      if (isTimeout) {
+        timeoutBanner.classList.remove("hidden");
+      } else {
+        timeoutBanner.classList.add("hidden");
+      }
+
+      const noteSur20 = ((correctCount / total) * 20).toFixed(2);
+      document.getElementById("score-raw").textContent = `${correctCount} / ${total}`;
+      document.getElementById("score-20").textContent = `${noteSur20} / 20`;
+      document.getElementById("time-used").textContent = formatTime(elapsedSeconds);
+
+      const feedbackEl = document.getElementById("result-feedback");
+      if (noteSur20 >= 16) {
+        feedbackEl.textContent = "Excellent travail ! Vous maîtrisez très solidement les 8 chapitres du cours du Prof. Fozin.";
+      } else if (noteSur20 >= 12) {
+        feedbackEl.textContent = "Bon résultat ! Revoyez les quelques points ci-dessous pour viser l'excellence au CC.";
+      } else if (noteSur20 >= 10) {
+        feedbackEl.textContent = "Moyenne atteinte de justesse. Analysez attentivement vos erreurs par chapitre avant l'examen.";
+      } else {
+        feedbackEl.textContent = "Des notions clés du cours restent à consolider. Relisez les explications détaillées ci-dessous puis relancez un tirage.";
+      }
+
+      // Rendu de la répartition par chapitre
+      const breakdownEl = document.getElementById("chapter-breakdown");
+      breakdownEl.innerHTML = "";
+      for (let c = 1; c <= 8; c++) {
+        const st = chapterStats[c];
+        if (st.total === 0) continue;
+        const ratio = st.correct / st.total;
+        let colorClasses = "bg-emerald-50 border-emerald-200 text-emerald-900";
+        if (ratio < 0.5) colorClasses = "bg-rose-50 border-rose-200 text-rose-900";
+        else if (ratio < 0.8) colorClasses = "bg-amber-50 border-amber-200 text-amber-900";
+
+        const card = document.createElement("div");
+        card.className = `p-3 rounded-xl border ${colorClasses}`;
+        card.innerHTML = `
+          <div class="text-xs font-bold truncate">${CHAPTER_NAMES[c]}</div>
+          <div class="text-lg font-extrabold mt-1">${st.correct} / ${st.total}</div>
+        `;
+        breakdownEl.appendChild(card);
+      }
+
+      window.__lastResultsData = resultsData;
+      filterReview("ALL");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    // ==================== AFFICHAGE DE LA CORRECTION DÉTAILLÉE ====================
+    function filterReview(mode) {
+      const btnAll = document.getElementById("filter-all");
+      const btnWrong = document.getElementById("filter-wrong");
+
+      if (mode === "ALL") {
+        btnAll.className = "px-3.5 py-2 rounded-xl bg-slate-900 text-white text-xs font-semibold cursor-pointer";
+        btnWrong.className = "px-3.5 py-2 rounded-xl bg-rose-50 text-rose-700 border border-rose-200 text-xs font-semibold cursor-pointer";
+      } else {
+        btnWrong.className = "px-3.5 py-2 rounded-xl bg-rose-600 text-white text-xs font-semibold cursor-pointer";
+        btnAll.className = "px-3.5 py-2 rounded-xl bg-slate-100 text-slate-700 border border-slate-200 text-xs font-semibold cursor-pointer";
+      }
+
+      const listEl = document.getElementById("review-list");
+      listEl.innerHTML = "";
+
+      const items = (window.__lastResultsData || []).filter(item =>
+        mode === "ALL" ? true : !item.isCorrect
+      );
+
+      if (items.length === 0) {
+        listEl.innerHTML = `
+          <div class="bg-emerald-50 border border-emerald-200 rounded-2xl p-6 text-center text-emerald-900 font-semibold">
+            Félicitations ! Aucune erreur à afficher dans cette sélection.
+          </div>
+        `;
+        return;
+      }
+
+      items.forEach(({ q, idx, isCorrect }) => {
+        const card = document.createElement("div");
+        card.className = `bg-white rounded-2xl border-2 p-5 sm:p-6 shadow-xs ${
+          isCorrect ? "border-emerald-200" : "border-rose-200"
+        }`;
+
+        const statusBadge = isCorrect
+          ? `<span class="px-2.5 py-1 rounded-lg bg-emerald-100 text-emerald-800 text-xs font-bold">✓ Correct (+1 pt)</span>`
+          : `<span class="px-2.5 py-1 rounded-lg bg-rose-100 text-rose-800 text-xs font-bold">✗ Incorrect (0 pt)</span>`;
+
+        const userAnswerFormatted = formatUserAnswerForReview(q, userAnswers[idx]);
+        const correctAnswerFormatted = formatCorrectAnswerForReview(q);
+
+        card.innerHTML = `
+          <div class="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-100">
+            <div class="flex items-center gap-2">
+              <span class="font-bold text-sm text-slate-800">Question ${idx + 1}</span>
+              ${statusBadge}
+            </div>
+            <span class="text-xs font-medium text-slate-500 bg-slate-100 px-2.5 py-1 rounded-lg">${CHAPTER_NAMES[q.chapter]}</span>
+          </div>
+
+          <h4 class="text-base font-bold text-slate-900 mt-3">${q.question}</h4>
+
+          <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+            <div class="p-3.5 rounded-xl ${isCorrect ? "bg-emerald-50/70 border border-emerald-200" : "bg-rose-50/70 border border-rose-200"}">
+              <div class="text-xs font-bold uppercase tracking-wider ${isCorrect ? "text-emerald-800" : "text-rose-800"} mb-1">
+                Votre réponse
+              </div>
+              <div class="text-slate-800 font-medium">${userAnswerFormatted}</div>
+            </div>
+
+            <div class="p-3.5 rounded-xl bg-blue-50/70 border border-blue-200">
+              <div class="text-xs font-bold uppercase tracking-wider text-blue-800 mb-1">
+                Réponse attendue (Cours)
+              </div>
+              <div class="text-slate-900 font-semibold">${correctAnswerFormatted}</div>
+            </div>
+          </div>
+
+          <div class="mt-3 p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 text-xs sm:text-sm text-slate-700">
+            <strong class="text-slate-900">Explication :</strong> ${q.explanation}
+          </div>
+        `;
+        listEl.appendChild(card);
+      });
+    }
+
+    function formatUserAnswerForReview(q, ans) {
+      if (q.type === "single") {
+        return ans !== null && ans !== undefined ? q.shuffledOptions[ans] : "<em>Aucune réponse sélectionnée</em>";
+      }
+      if (q.type === "multiple") {
+        if (!Array.isArray(ans) || ans.length === 0) return "<em>Aucune case cochée</em>";
+        return "<ul class='list-disc pl-4 space-y-1'>" + ans.map(i => `<li>${q.shuffledOptions[i]}</li>`).join("") + "</ul>";
+      }
+      return "";
+    }
+
+    function formatCorrectAnswerForReview(q) {
+      if (q.type === "single") {
+        return q.shuffledOptions[q.correctIndex];
+      }
+      if (q.type === "multiple") {
+        return "<ul class='list-disc pl-4 space-y-1'>" + q.correctIndices.map(i => `<li>${q.shuffledOptions[i]}</li>`).join("") + "</ul>";
+      }
+      return "";
+    }
+  </script>
+</body>
+</html>
